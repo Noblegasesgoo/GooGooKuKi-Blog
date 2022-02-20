@@ -1,4 +1,4 @@
-# GooGooKuKi-Blog
+# goo-blog
 
 #### Description
 咕咕博客后台
