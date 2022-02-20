@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhao.blog.mapper.UserMessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhao.blog.domain.entity.UserMessage">
+        <id column="id" property="id" />
+        <result column="from_user_id" property="fromUserId" />
+        <result column="to_user_id" property="toUserId" />
+        <result column="article_id" property="articleId" />
+        <result column="comment_id" property="commentId" />
+        <result column="content" property="content" />
+        <result column="message_status" property="messageStatus" />
+        <result column="type" property="type" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <resultMap id="selectPrivateMessageForCurrentUserResultMap" type="com.zhao.blog.vo.MessageVo">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="comment_id" property="commentId" />
+        <result column="content" property="content" />
+        <result column="message_status" property="messageStatus" />
+        <result column="gmt_create" property="gmtCreate" />
+
+        <association property="fromUser" javaType="com.zhao.blog.vo.SysUserVo">
+            <id column="from_id" property="id" />
+            <result column="from_nickname" property="nickname" />
+            <result column="from_face" property="face" />
+            <result column="from_is_deleted" property="isDeleted" />
+        </association>
+
+        <association property="toUser" javaType="com.zhao.blog.vo.SysUserVo">
+            <id column="to_id" property="id" />
+            <result column="to_nickname" property="nickname" />
+            <result column="to_face" property="face" />
+            <result column="to_is_deleted" property="isDeleted" />
+        </association>
+
+        <association property="article" javaType="com.zhao.blog.vo.ArticleVo">
+            <id column="article_id" property="id" />
+            <result column="title" property="title" />
+        </association>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, from_user_id, to_user_id, article_id, comment_id, content, message_status, type, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <select id="selectPrivateMessageForCurrentUser" resultMap="selectPrivateMessageForCurrentUserResultMap">
+        SELECT
+            gum.id as id,
+            gum.type as type,
+
+            gsu1.id as from_id,
+            gsu1.nickname as from_nickname,
+            gsu1.face as from_face,
+            gsu1.is_deleted as from_is_deleted,
+
+            gsu2.id as to_id,
+            gsu2.nickname as to_nickname,
+            gsu2.face as to_face,
+            gsu2.is_deleted as to_is_deleted,
+
+            ga.id as article_id,
+            ga.title as title,
+
+            gum.comment_id as comment_id,
+            gum.content as content,
+            gum.message_status as message_status,
+            gum.gmt_create as gmt_create
+
+        FROM
+            goo_user_message gum,
+            goo_sys_user gsu1,
+            goo_sys_user gsu2,
+            goo_article ga
+        WHERE
+            <if test="messageParams.status != null">
+                gum.message_status = #{messageParams.status} AND
+            </if>
+            gsu1.id = gum.from_user_id AND
+            #{id} = gum.to_user_id and
+            gsu2.id = #{id} AND
+            ga.id = gum.article_id AND
+            gum.is_deleted = 0
+    </select>
+
+<!--    <select id="selectPrivateReplyForCurrentUser" resultMap="selectPrivateMessageForCurrentUserResultMap">-->
+
+<!--        SELECT-->
+<!--            gum.id as id,-->
+
+<!--            gsu1.id as from_id,-->
+<!--            gsu1.nickname as from_nickname,-->
+<!--            gsu1.face as from_face,-->
+<!--            gsu1.is_deleted as from_is_deleted,-->
+
+<!--            gsu2.id as to_id,-->
+<!--            gsu2.nickname as to_nickname,-->
+<!--            gsu2.face as to_face,-->
+<!--            gsu2.is_deleted as to_is_deleted,-->
+
+<!--            ga.id as article_id,-->
+<!--            ga.title as title,-->
+
+<!--            gum.comment_id as comment_id,-->
+<!--            gum.content as content,-->
+<!--            gum.message_status as message_status,-->
+<!--            gum.gmt_create as gmt_create-->
+
+<!--        FROM-->
+<!--            goo_user_message gum,-->
+<!--            goo_sys_user gsu1,-->
+<!--            goo_sys_user gsu2,-->
+<!--            goo_article ga-->
+
+<!--        WHERE-->
+<!--            <if test="messageParams.status != null">-->
+<!--                gum.message_status = #{messageParams.status} AND-->
+<!--            </if>-->
+<!--            gsu1.id = gum.from_user_id AND-->
+<!--            #{id} = gum.to_user_id AND-->
+<!--            gsu2.id = #{id} AND-->
+<!--            ga.id = gum.article_id AND-->
+<!--            gum.is_deleted = 0 AND-->
+<!--            gum.type = 1-->
+
+<!--    </select>-->
+
+<!--    <select id="selectPrivateCommentForCurrentUser" resultMap="selectPrivateMessageForCurrentUserResultMap">-->
+
+<!--        SELECT-->
+<!--            gum.id as id,-->
+
+<!--            gsu1.id as from_id,-->
+<!--            gsu1.nickname as from_nickname,-->
+<!--            gsu1.face as from_face,-->
+<!--            gsu1.is_deleted as from_is_deleted,-->
+
+<!--            gsu2.id as to_id,-->
+<!--            gsu2.nickname as to_nickname,-->
+<!--            gsu2.face as to_face,-->
+<!--            gsu2.is_deleted as to_is_deleted,-->
+
+<!--            ga.id as article_id,-->
+<!--            ga.title as title,-->
+
+<!--            gum.comment_id as comment_id,-->
+<!--            gum.content as content,-->
+<!--            gum.message_status as message_status,-->
+<!--            gum.gmt_create as gmt_create-->
+
+<!--        FROM-->
+<!--            goo_user_message gum,-->
+<!--            goo_sys_user gsu1,-->
+<!--            goo_sys_user gsu2,-->
+<!--            goo_article ga-->
+
+<!--        WHERE-->
+<!--            <if test="messageParams.status != null">-->
+<!--                gum.message_status = #{messageParams.status} AND-->
+<!--            </if>-->
+<!--            gsu1.id = gum.from_user_id AND-->
+<!--            #{id} = gum.to_user_id AND-->
+<!--            gsu2.id = #{id} AND-->
+<!--            ga.id = gum.article_id AND-->
+<!--            gum.is_deleted = 0 AND-->
+<!--            gum.type = 2-->
+
+<!--    </select>-->
+
+
+</mapper>

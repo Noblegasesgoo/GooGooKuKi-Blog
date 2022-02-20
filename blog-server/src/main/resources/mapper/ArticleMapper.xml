@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhao.blog.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhao.blog.domain.entity.Article">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="summary" property="summary" />
+        <result column="view_counts" property="viewCounts" />
+        <result column="comment_counts" property="commentCounts" />
+        <result column="author_id" property="authorId" />
+        <result column="body_id" property="bodyId" />
+        <result column="category_id" property="categoryId" />
+        <result column="is_top" property="isTop" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <resultMap id="selectArticleBaseResultMap" type="com.zhao.blog.vo.ArticleOptimizeVo">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="summary" property="summary" />
+        <result column="view_counts" property="viewCounts" />
+        <result column="comment_counts" property="commentCounts" />
+        <result column="is_top" property="isTop" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+
+        <association property="author" javaType="com.zhao.blog.vo.SysUserVo">
+            <id column="author_id" property="id" />
+            <result column="author_name" property="nickname" />
+            <result column="author_face" property="face" />
+            <result column="is_deleted_author" property="isDeleted" />
+        </association>
+
+        <association property="body" javaType="com.zhao.blog.vo.ArticleBodyVo">
+            <id column="body_id" property="id" />
+            <result column="content" property="content" />
+            <result column="content_html" property="contentHtml" />
+        </association>
+
+        <association property="category" javaType="com.zhao.blog.vo.CategoryVo">
+            <id column="category_id" property="id" />
+            <result column="avatar" property="avatar" />
+            <result column="category_name" property="categoryName" />
+            <result column="description" property="description" />
+        </association>
+
+        <collection property="tags" ofType="com.zhao.blog.vo.TagVo">
+            <id column="tag_id" property="id" />
+            <result column="tag_name" property="tagName" />
+            <result column="is_deleted_tag" property="isDeleted" />
+        </collection>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, summary, view_counts, comment_counts, author_id, body_id, category_id, is_top, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <!-- List<ArchivesDo> selectArchivesArticle() -->
+    <select id="selectArchivesArticle" resultType="com.zhao.blog.domain.dos.ArchivesDo">
+        SELECT
+            YEAR( ga.gmt_create )  AS `year`,
+            MONTH( ga.gmt_create ) AS `month`,
+            COUNT(*) AS `count`
+        FROM
+            goo_article ga
+        GROUP BY
+            `year`,
+            `month`
+        <if test="archivesParams.year!=null and archivesParams.month!=null">
+            HAVING
+            `year`=#{archivesParams.year} AND
+            `month`=#{archivesParams.month}
+        </if>
+    </select>
+
+    <select id="selectArticle" resultMap="selectArticleBaseResultMap">
+        SELECT
+            ga.id as id,
+            ga.title as title,
+            ga.summary as summary,
+            ga.view_counts as view_counts,
+            ga.comment_counts as comment_counts,
+            ga.is_top as is_top,
+            ga.is_deleted as is_deleted,
+            ga.gmt_create as gmt_create,
+
+            gsu.id as author_id,
+            gsu.nickname as author_name,
+            gsu.face as author_face,
+            gsu.is_deleted as is_deleted_author
+
+        FROM
+            goo_article ga
+            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+            LEFT JOIN goo_category gc ON ga.category_id = gc.id
+
+        WHERE
+            <if test="pageParams.categoryId != null">
+                gc.id = #{pageParams.categoryId} AND
+            </if>
+            <if test="pageParams.date != null">
+                ga.gmt_create LIKE CONCAT(#{pageParams.date},'%') AND
+            </if>
+            ga.is_deleted = 0
+
+
+<!--        SELECT-->
+<!--            ga.id as id,-->
+<!--            ga.title as title,-->
+<!--            ga.summary as summary,-->
+<!--            ga.view_counts as view_counts,-->
+<!--            ga.comment_counts as comment_counts,-->
+<!--            ga.is_top as is_top,-->
+<!--            ga.is_deleted as is_deleted,-->
+<!--            ga.gmt_create as gmt_create,-->
+
+<!--            gsu.id as author_id,-->
+<!--            gsu.nickname as author_name,-->
+<!--            gsu.face as author_face,-->
+<!--            gsu.is_deleted as is_deleted_author,-->
+
+<!--            gt.id as tag_id,-->
+<!--            gt.tag_name as tag_name,-->
+<!--            gt.is_deleted as is_deleted_tag,-->
+
+<!--            gc.id as category_id,-->
+<!--            gc.avatar as avatar,-->
+<!--            gc.category_name as category_name,-->
+<!--            gc.description as description-->
+
+<!--        FROM-->
+<!--            goo_article ga-->
+<!--            LEFT JOIN goo_article_tag gat ON ga.id = gat.article_id-->
+<!--            LEFT JOIN goo_tag gt ON gat.tag_id = gt.id-->
+<!--            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id-->
+<!--            LEFT JOIN goo_category gc ON ga.category_id = gc.id-->
+
+<!--        WHERE-->
+<!--            <if test="pageParams.categoryId != null">-->
+<!--                gc.id = #{pageParams.categoryId} AND-->
+<!--            </if>-->
+<!--            <if test="pageParams.tagId != null">-->
+<!--                gt.id = #{pageParams.tagId} AND-->
+<!--            </if>-->
+<!--            <if test="pageParams.date != null">-->
+<!--                ga.gmt_create LIKE CONCAT(#{pageParams.date},'%') AND-->
+<!--            </if>-->
+<!--            ga.is_deleted = 0-->
+    </select>
+
+    <select id="selectArticleById" resultMap="selectArticleBaseResultMap">
+        SELECT
+            ga.id as id,
+            ga.title as title,
+            ga.summary as summary,
+            ga.view_counts as view_counts,
+            ga.comment_counts as comment_counts,
+            ga.is_top as is_top,
+            ga.is_deleted as is_deleted,
+            ga.gmt_create as gmt_create,
+
+            gsu.id as author_id,
+            gsu.nickname as author_name,
+            gsu.face as author_face,
+            gsu.is_deleted as is_deleted_author,
+
+            gt.id as tag_id,
+            gt.tag_name as tag_name,
+            gt.is_deleted as is_deleted_tag,
+
+            gc.id as category_id,
+            gc.avatar as avatar,
+            gc.category_name as category_name,
+            gc.description as description,
+
+            gab.id as body_id,
+            gab.content as content,
+            gab.content_html as content_html,
+            gab.is_deleted as body_is_deleted
+
+        FROM
+            goo_article ga
+            LEFT JOIN goo_article_tag gat ON ga.id = gat.article_id
+            LEFT JOIN goo_tag gt ON gat.tag_id = gt.id
+            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+            LEFT JOIN goo_category gc ON ga.category_id = gc.id
+            LEFT JOIN goo_article_body gab ON gab.article_id = ga.id
+        WHERE
+            ga.id = #{id} AND
+            ga.is_deleted = 0
+    </select>
+
+    <select id="selectMyselfArticle" resultMap="selectArticleBaseResultMap">
+        SELECT
+            ga.id as id,
+            ga.title as title,
+            ga.summary as summary,
+            ga.view_counts as view_counts,
+            ga.comment_counts as comment_counts,
+            ga.is_top as is_top,
+            ga.is_deleted as is_deleted,
+            ga.gmt_create as gmt_create,
+
+            gsu.id as author_id,
+            gsu.nickname as author_name,
+            gsu.face as author_face,
+            gsu.is_deleted as is_deleted_author,
+
+            gt.id as tag_id,
+            gt.tag_name as tag_name,
+            gt.is_deleted as is_deleted_tag,
+
+            gc.id as category_id,
+            gc.avatar as avatar,
+            gc.category_name as category_name,
+            gc.description as description
+
+        FROM
+            goo_article ga
+            LEFT JOIN goo_article_tag gat ON ga.id = gat.article_id
+            LEFT JOIN goo_tag gt ON gat.tag_id = gt.id
+            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+            LEFT JOIN goo_category gc ON ga.category_id = gc.id
+
+        WHERE
+            <if test="pageParams.categoryId != null">
+                gc.id = #{pageParams.categoryId} AND
+            </if>
+            <if test="pageParams.tagId != null">
+                gt.id = #{pageParams.tagId} AND
+            </if>
+            <if test="pageParams.date != null">
+                ga.gmt_create LIKE CONCAT(#{pageParams.date},'%') AND
+            </if>
+            gsu.id = #{id} AND
+            ga.is_deleted = 0
+    </select>
+
+    <select id="selectArticleByTagId" resultMap="selectArticleBaseResultMap">
+        SELECT
+            ga.id as id,
+            ga.title as title,
+            ga.summary as summary,
+            ga.view_counts as view_counts,
+            ga.comment_counts as comment_counts,
+            ga.is_top as is_top,
+            ga.is_deleted as is_deleted,
+            ga.gmt_create as gmt_create,
+
+            gsu.id as author_id,
+            gsu.nickname as author_name,
+            gsu.face as author_face,
+            gsu.is_deleted as is_deleted_author
+
+        FROM
+            goo_article ga
+            LEFT JOIN goo_article_tag gat ON ga.id = gat.article_id
+            LEFT JOIN goo_tag gt ON gat.tag_id = gt.id
+            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+        WHERE
+            gt.id = #{pageParams.tagId} AND
+            ga.is_deleted = 0
+    </select>
+
+    <select id="selectArticleForEs" resultMap="selectArticleBaseResultMap">
+        SELECT
+            ga.id as id,
+            ga.title as title,
+            ga.summary as summary,
+            ga.view_counts as view_counts,
+            ga.comment_counts as comment_counts,
+            ga.is_top as is_top,
+            ga.is_deleted as is_deleted,
+            ga.gmt_create as gmt_create,
+
+            gsu.id as author_id,
+            gsu.nickname as author_name,
+            gsu.face as author_face,
+            gsu.is_deleted as is_deleted_author
+
+        FROM
+            goo_article ga
+            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+            LEFT JOIN goo_category gc ON ga.category_id = gc.id
+
+        WHERE
+            ga.is_deleted = 0
+    </select>
+
+</mapper>

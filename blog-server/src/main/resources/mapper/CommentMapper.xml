@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhao.blog.mapper.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhao.blog.domain.entity.Comment">
+        <id column="id" property="id" />
+        <result column="comment_content" property="commentContent" />
+        <result column="article_id" property="articleId" />
+        <result column="author_id" property="authorId" />
+        <result column="parent_id" property="parentId" />
+        <result column="to_uid" property="toUid" />
+        <result column="level" property="level" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <resultMap id="listAllCommentsForCurrentArticleResultMap" type="com.zhao.blog.vo.CommentVo">
+        <id column="id" property="id" />
+        <result column="level" property="level" />
+        <result column="parent_id" property="parentId" />
+        <result column="comment_content" property="commentContent" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+
+        <association property="author" javaType="com.zhao.blog.vo.SysUserVo">
+            <id column="user_id" property="id"/>
+            <result column="user_nickname" property="nickname"/>
+            <result column="user_face" property="face"/>
+            <result column="is_user_deleted" property="isDeleted"/>
+        </association>
+
+        <association property="toUser" javaType="com.zhao.blog.vo.SysUserVo">
+            <id column="to_user_id" property="id"/>
+            <result column="to_user_nickname" property="nickname"/>
+            <result column="to_user_face" property="face"/>
+            <result column="to_user_is_deleted" property="isDeleted"/>
+        </association>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, comment_content, article_id, author_id, parent_id, to_uid, level, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+
+    <select id="selectAllCommentsForCurrentArticleLevelOne" resultMap="listAllCommentsForCurrentArticleResultMap">
+        SELECT
+            gc.id AS id,
+            gc.`level` AS `level`,
+            gc.`parent_id` AS `parent_id`,
+
+            gsu1.id AS user_id,
+            gsu1.nickname AS user_nickname,
+            gsu1.face AS user_face,
+            gsu1.is_deleted AS is_user_deleted,
+
+            gc.comment_content AS comment_content,
+
+            gc.is_deleted AS is_deleted,
+            gc.gmt_create AS gmt_create
+        FROM
+
+            goo_comment gc,
+            goo_sys_user gsu1
+        WHERE
+            #{id} = gc.article_id
+            AND gc.author_id = gsu1.id
+            AND gc.level = 1
+            AND gc.is_deleted = 0
+        ORDER BY
+            gmt_create DESC
+    </select>
+
+    <select id="selectAllCommentsForCurrentArticleLevelTow" resultMap="listAllCommentsForCurrentArticleResultMap">
+        SELECT
+            gc.id AS id,
+            gc.`level` AS `level`,
+            gc.`parent_id` AS `parent_id`,
+
+            gsu1.id AS user_id,
+            gsu1.nickname AS user_nickname,
+            gsu1.face AS user_face,
+            gsu1.is_deleted AS is_user_deleted,
+
+            gsu2.id AS to_user_id,
+            gsu2.nickname AS to_user_nickname,
+            gsu2.face AS to_user_face,
+            gsu2.is_deleted AS to_user_is_deleted,
+
+            gc.comment_content AS comment_content,
+
+            gc.is_deleted AS is_deleted,
+            gc.gmt_create AS gmt_create
+
+        FROM
+
+            goo_comment gc,
+            goo_sys_user gsu1,
+            goo_sys_user gsu2
+        WHERE
+            #{id} = gc.article_id
+            AND gc.author_id = gsu1.id
+            AND gc.to_uid = gsu2.id
+            AND gc.level = 2
+            AND gc.is_deleted = 0
+        ORDER BY
+            gmt_create DESC
+    </select>
+
+</mapper>

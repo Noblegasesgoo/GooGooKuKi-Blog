@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhao.blog.mapper.SysLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhao.blog.domain.entity.SysLog">
+        <id column="id" property="id" />
+        <result column="ip" property="ip" />
+        <result column="method" property="method" />
+        <result column="module" property="module" />
+        <result column="nickname" property="nickname" />
+        <result column="operation" property="operation" />
+        <result column="paragoo" property="paragoo" />
+        <result column="user_id" property="userId" />
+        <result column="time" property="time" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ip, method, module, nickname, operation, paragoo, user_id, time, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+</mapper>
