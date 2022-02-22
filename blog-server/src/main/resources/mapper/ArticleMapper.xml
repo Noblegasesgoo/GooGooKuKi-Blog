@@ -198,35 +198,24 @@
 
     <select id="selectMyselfArticle" resultMap="selectArticleBaseResultMap">
         SELECT
-            ga.id as id,
-            ga.title as title,
-            ga.summary as summary,
-            ga.view_counts as view_counts,
-            ga.comment_counts as comment_counts,
-            ga.is_top as is_top,
-            ga.is_deleted as is_deleted,
-            ga.gmt_create as gmt_create,
+        ga.id as id,
+        ga.title as title,
+        ga.summary as summary,
+        ga.view_counts as view_counts,
+        ga.comment_counts as comment_counts,
+        ga.is_top as is_top,
+        ga.is_deleted as is_deleted,
+        ga.gmt_create as gmt_create,
 
-            gsu.id as author_id,
-            gsu.nickname as author_name,
-            gsu.face as author_face,
-            gsu.is_deleted as is_deleted_author,
-
-            gt.id as tag_id,
-            gt.tag_name as tag_name,
-            gt.is_deleted as is_deleted_tag,
-
-            gc.id as category_id,
-            gc.avatar as avatar,
-            gc.category_name as category_name,
-            gc.description as description
+        gsu.id as author_id,
+        gsu.nickname as author_name,
+        gsu.face as author_face,
+        gsu.is_deleted as is_deleted_author
 
         FROM
-            goo_article ga
-            LEFT JOIN goo_article_tag gat ON ga.id = gat.article_id
-            LEFT JOIN goo_tag gt ON gat.tag_id = gt.id
-            LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
-            LEFT JOIN goo_category gc ON ga.category_id = gc.id
+        goo_article ga
+        LEFT JOIN goo_sys_user gsu ON ga.author_id = gsu.id
+        LEFT JOIN goo_category gc ON ga.category_id = gc.id
 
         WHERE
             <if test="pageParams.categoryId != null">
@@ -240,6 +229,7 @@
             </if>
             gsu.id = #{id} AND
             ga.is_deleted = 0
+
     </select>
 
     <select id="selectArticleByTagId" resultMap="selectArticleBaseResultMap">
