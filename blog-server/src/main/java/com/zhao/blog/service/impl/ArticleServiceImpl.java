@@ -651,4 +651,31 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         return articleOptimizeVos;
     }
+
+    /**
+     * 删除文章（逻辑删除）
+     * @param user
+     * @param articleParams
+     * @return Boolean
+     */
+    @Override
+    public Boolean deleteArticleByAuthor(SysUser user, ArticleParams articleParams) {
+
+        Long userId = user.getId();
+        Long authorId = articleParams.getAuthorId();
+
+        if (userId != authorId) {
+            return false;
+        }
+
+        Article article = new Article();
+        article.setId(articleParams.getArticleId());
+        article.setIsDeleted(true);
+        int i = articleMapper.updateById(article);
+        if (i == 0) {
+            return false;
+        }
+
+        return true;
+    }
 }

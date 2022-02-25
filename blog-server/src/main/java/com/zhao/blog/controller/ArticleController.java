@@ -147,7 +147,7 @@ public class ArticleController {
 
     @MyLogger(module = "文章管理", operation = "文章编辑请求")
     @ApiOperation(value = "文章编辑请求")
-    @PostMapping("/private/update")
+    @PutMapping("/private/update")
     public Response updateArticleByCurrentUser(@RequestBody ArticleParams articleParams) {
 
         SysUser user = UserThreadLocalUtils.get();
@@ -172,7 +172,7 @@ public class ArticleController {
     public Response queryMyselfArticle(@RequestBody PageParams pageParams) {
 
         if (null == pageParams.getAuthorId() || null == pageParams.getPage() || null == pageParams.getPageSize()) {
-            log.error("[blog|LoginController|doLogin] 参数不完整！");
+            log.error("[blog|ArticleController|queryMyselfArticle] 参数不完整！");
             return new Response(StatusCode.STATUS_CODEC400.getCode(), "缺少必要参数！", pageParams);
         }
 
@@ -192,7 +192,7 @@ public class ArticleController {
     public Response queryArticleListByTagId(@RequestBody PageParams pageParams) {
 
         if (null == pageParams.getTagId() || null == pageParams.getPage() || null == pageParams.getPageSize()) {
-            log.error("[blog|LoginController|doLogin] 参数不完整！");
+            log.error("[blog|ArticleController|queryArticleListByTagId] 参数不完整！");
             return new Response(StatusCode.STATUS_CODEC400.getCode(), "缺少必要参数！", pageParams);
         }
 
@@ -211,7 +211,7 @@ public class ArticleController {
     public Response queryArticleListFromEs(@RequestBody EsParams esParams) {
 
         if (null == esParams.getCondition() || null == esParams.getPage() || null == esParams.getPageSize()) {
-            log.error("[blog|LoginController|doLogin] 参数不完整！");
+            log.error("[blog|ArticleController|queryArticleListFromEs] 参数不完整！");
             return new Response(StatusCode.STATUS_CODEC400.getCode(), "缺少必要参数！", esParams);
         }
 
@@ -222,5 +222,26 @@ public class ArticleController {
         }
 
         return new Response(StatusCode.STATUS_CODEC200.getCode(), "文章查询成功！", articleOptimizeVos);
+    }
+
+    @MyLogger(module = "文章管理", operation = "逻辑删除文章接口")
+    @ApiOperation(value = "逻辑删除文章接口")
+    @PutMapping("/private/delete")
+    public Response deleteArticleByAuthor(@RequestBody ArticleParams articleParams) {
+
+        if (null == articleParams
+                || null == articleParams.getArticleId()
+                || null == articleParams.getAuthorId()) {
+            log.error("[blog|ArticleController|deleteArticleByAuthor] 参数不完整！");
+            return new Response(StatusCode.STATUS_CODEC400.getCode(), "缺少必要参数！", articleParams);
+        }
+        SysUser user = UserThreadLocalUtils.get();
+        Boolean result = articleService.deleteArticleByAuthor(user, articleParams);
+
+        if (!result) {
+            return new Response(StatusCode.STATUS_CODEC200.getCode(), "数据库错误，逻辑删除失败！", result);
+        }
+
+        return new Response(StatusCode.STATUS_CODEC200.getCode(), "文章删除成功！", result);
     }
 }

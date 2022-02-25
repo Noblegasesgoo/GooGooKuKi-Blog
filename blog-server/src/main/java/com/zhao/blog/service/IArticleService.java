@@ -3,6 +3,7 @@ package com.zhao.blog.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhao.blog.domain.dos.ArchivesDo;
 import com.zhao.blog.domain.entity.Article;
+import com.zhao.blog.domain.entity.SysUser;
 import com.zhao.blog.vo.ArticleOptimizeVo;
 import com.zhao.blog.vo.ArticleVo;
 import com.zhao.blog.vo.params.ArchivesParams;
@@ -112,4 +113,12 @@ public interface IArticleService extends IService<Article> {
      * @return List<ArticleOptimizeVo>
      */
     List<ArticleOptimizeVo> listArticleByFromEs(EsParams esParams);
+
+    /**
+     * 删除文章（逻辑删除）
+     * @param user
+     * @param articleParams
+     * @return Boolean
+     */
+    Boolean deleteArticleByAuthor(SysUser user, ArticleParams articleParams);
 }
