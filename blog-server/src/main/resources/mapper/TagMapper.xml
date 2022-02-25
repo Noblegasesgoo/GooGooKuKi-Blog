@@ -35,7 +35,7 @@
     <!-- List<Tag> selectTheSixHotTag(); -->
     <select id="selectTheSixHotTag" resultMap="BaseResultMap">
         SELECT
-            gt.id,
+            gt.id as tag_id,
             gt.tag_name
         FROM
             goo_article_tag gat
