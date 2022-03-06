@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhao.blog.mapper.ArticleMapper;
 import com.zhao.blog.vo.ArticleOptimizeVo;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -46,6 +48,10 @@ public class EsHandler {
     @Async("taskExecutorForArticle")
     public void updateEsData() throws IOException {
         log.info("=====>>>>> 同步查询数据开始执行...  {}", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+
+        /** 删除index下的所有内容再更新 **/
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest("googookukiblogarticlesindex");
+        AcknowledgedResponse deleteIndexRes = restHighLevelClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
 
         /** 从数据库中查询当前最新数据 **/
         List<ArticleOptimizeVo> articleOptimizeVos = articleMapper.selectArticleForEs();
