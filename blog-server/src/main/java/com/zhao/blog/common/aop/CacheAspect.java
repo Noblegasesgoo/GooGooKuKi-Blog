@@ -57,7 +57,7 @@ public class CacheAspect {
             Class[] parameterTypes = new Class[proceedingJoinPoint.getArgs().length];
             /** 用于获取标注方法的参数 **/
             Object[] args = proceedingJoinPoint.getArgs();
-            /** 循环将参数所对应的**/
+            /** 循环将参数所对应的类型装入 **/
             StringBuilder params = new StringBuilder();
             for (int i = 0; i < args.length; i++) {
                 /** 如果当前这个参数有值的话 **/
