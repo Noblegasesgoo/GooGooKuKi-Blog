@@ -32,8 +32,8 @@ public class ViewCountHandler {
     @Resource
     private ArticleMapper articleMapper;
 
-    /** 每隔十秒进行一次任务 **/
-    @Scheduled(cron = "*/10 * * * * ?")
+    /** 每隔一个小时进行一次任务 **/
+    @Scheduled(cron = "0 */59 * * * ?")
     @Async("taskExecutorForArticle")
     public void viewCountScheduled(){
         log.info("=====>>>>> 同步浏览量开始执行...  {}", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));

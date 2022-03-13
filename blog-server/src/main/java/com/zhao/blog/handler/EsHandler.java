@@ -44,7 +44,7 @@ public class EsHandler {
     private ArticleMapper articleMapper;
 
     /** 每隔59秒进行一次任务 **/
-    @Scheduled(cron = "*/59 * * * * ?")
+    @Scheduled(cron = "0 */59 * * * ?")
     @Async("taskExecutorForArticle")
     public void updateEsData() throws IOException {
         log.info("=====>>>>> 同步查询数据开始执行...  {}", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
