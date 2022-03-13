@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author noblegasesgoo
@@ -33,5 +34,6 @@ public class EsParams {
 
     /** 文章对应类别id **/
     @ApiModelProperty(value = "中文条件查询条件")
+    @Length(min = 0, max = 40)
     private String condition;
 }

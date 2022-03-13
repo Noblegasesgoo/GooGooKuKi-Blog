@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author noblegasesgoo
@@ -24,11 +25,14 @@ import lombok.experimental.Accessors;
 public class PasswordParams {
 
     @ApiModelProperty(value = "旧密码")
+    @Length(min = 0, max = 64)
     private String oldPassword;
 
     @ApiModelProperty(value = "新密码")
+    @Length(min = 0, max = 64)
     private String newPasswordForInput;
 
     @ApiModelProperty(value = "确认新密码密码")
+    @Length(min = 0, max = 64)
     private String newPasswordForLastInput;
 }

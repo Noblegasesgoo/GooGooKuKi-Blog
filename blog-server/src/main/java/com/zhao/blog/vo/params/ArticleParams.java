@@ -9,7 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -28,15 +30,19 @@ import java.util.List;
 public class ArticleParams {
 
     @ApiModelProperty(value = "文章id")
+    @Min(value = 0, message = "必须为非负数")
     private Long articleId;
 
     @ApiModelProperty(value = "文章作者id")
+    @Min(value = 0, message = "必须为非负数")
     private Long authorId;
 
     @ApiModelProperty(value = "文章标题")
+    @Length(min = 1, max = 50)
     private String title;
 
     @ApiModelProperty(value = "文章摘要")
+    @Length(min = 1, max = 180)
     private String summary;
 
     @ApiModelProperty(value = "文章内容")
