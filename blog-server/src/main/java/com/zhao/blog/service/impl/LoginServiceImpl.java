@@ -142,7 +142,6 @@ public class LoginServiceImpl implements ILoginService {
     public Boolean logout(String token) {
 
         Boolean result = redisTemplate.delete("TOKEN_" + token);
-        ;
 
         return result;
     }
