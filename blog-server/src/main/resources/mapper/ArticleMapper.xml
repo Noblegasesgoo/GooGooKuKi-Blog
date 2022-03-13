@@ -85,15 +85,10 @@
             ga.title as title,
             ga.summary as summary,
             ga.view_counts as view_counts,
-            ga.comment_counts as comment_counts,
             ga.is_top as is_top,
-            ga.is_deleted as is_deleted,
             ga.gmt_create as gmt_create,
 
-            gsu.id as author_id,
-            gsu.nickname as author_name,
-            gsu.face as author_face,
-            gsu.is_deleted as is_deleted_author
+            gsu.nickname as author_name
 
         FROM
             goo_article ga
@@ -204,7 +199,6 @@
         ga.view_counts as view_counts,
         ga.comment_counts as comment_counts,
         ga.is_top as is_top,
-        ga.is_deleted as is_deleted,
         ga.gmt_create as gmt_create,
 
         gsu.id as author_id,
@@ -240,7 +234,6 @@
             ga.view_counts as view_counts,
             ga.comment_counts as comment_counts,
             ga.is_top as is_top,
-            ga.is_deleted as is_deleted,
             ga.gmt_create as gmt_create,
 
             gsu.id as author_id,
@@ -264,15 +257,10 @@
             ga.title as title,
             ga.summary as summary,
             ga.view_counts as view_counts,
-            ga.comment_counts as comment_counts,
             ga.is_top as is_top,
-            ga.is_deleted as is_deleted,
             ga.gmt_create as gmt_create,
 
-            gsu.id as author_id,
-            gsu.nickname as author_name,
-            gsu.face as author_face,
-            gsu.is_deleted as is_deleted_author
+            gsu.nickname as author_name
 
         FROM
             goo_article ga
