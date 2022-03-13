@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author noblegasesgoo
  * @version 0.0.1
@@ -27,6 +29,7 @@ public class ArticleBodyParams {
     private Long id;
 
     @ApiModelProperty(value = "文章md格式内容")
+    @NotNull
     private String content;
 
     @ApiModelProperty(value = "文章html格式内容")
