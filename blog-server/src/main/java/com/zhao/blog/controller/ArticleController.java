@@ -94,6 +94,7 @@ public class ArticleController {
         return new Response(StatusCode.STATUS_CODEC200.getCode(), "查询最热文章成功！", result);
     }
 
+    @MyCache(name = "new_article")
     @MyLogger(module = "文章管理", operation = "查询首页最新文章请求")
     @ApiOperation(value = "查询首页最新文章请求")
     @GetMapping("/public/new")
