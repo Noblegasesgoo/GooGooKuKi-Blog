@@ -23,7 +23,7 @@ public class BlogArticleReceiver {
     private StringRedisTemplate redisTemplate;
 
     /**
-     * 异步更新商品信息消息
+     * 异步更新文章详情信息消息
      * @param articleId
      */
     @RabbitListener(queues = "articleContentQueue")
