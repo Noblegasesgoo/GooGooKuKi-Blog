@@ -20,6 +20,7 @@ import com.zhao.blog.vo.params.ArticleParams;
 import com.zhao.blog.vo.params.EsParams;
 import com.zhao.blog.vo.params.PageParams;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -399,6 +400,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return false;
         }
 
+        /** 如果传入的最新对应标签存在的话 **/
         if (null != tags) {
 
             /** 设置文章对应标签 **/
@@ -425,13 +427,26 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleBody.setContentHtml(articleParams.getBody().getContentHtml());
         articleBodyService.updateById(articleBody);
 
+        /** 下部就是延迟双删 **/
+        /** 删除redis中关于该文章的缓存 **/
+        /** 延迟双删第一删**/
+
+        String params = DigestUtils.md5Hex(articleParams.getArticleId().toString());
+        String redisKey = "article_content::ArticleController::queryArticleById::"+params;
+        Boolean delete = redisTemplate.delete(redisKey);
+        if (!delete) {
+            log.error("[goo-blog|ArticleServiceImpl|updateArticleByCurrentUser] 文章编辑，缓存第一删失败...");
+            return false;
+        }
+
         /** 更新文章信息 **/
         int i = articleMapper.updateById(article);
 
         if (i == NUMBER_ONE) {
 
             /** 延迟至数据库更新之后再更新缓存 **/
-            blogArticleSender.toDoDeleteArticleContentCache(article.getId());
+            /** 延迟双删第二删交给 **/
+            blogArticleSender.toDoDeleteArticleContentCache(articleParams.getArticleId());
             return true;
         }
 

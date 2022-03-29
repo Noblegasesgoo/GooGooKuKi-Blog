@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
  */
 
 @Configuration
-@EnableAsync
+@EnableAsync(proxyTargetClass = true) /** 开启 cglib 代理 **/
 public class ThreadPoolConfig {
 
     @Bean("taskExecutorForArticle")

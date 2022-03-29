@@ -53,5 +53,4 @@ public class ArticleParams {
 
     @ApiModelProperty(value = "文章标签")
     private List<TagVo> tags;
-
 }

@@ -7,6 +7,7 @@ import com.zhao.blog.mapper.ArticleMapper;
 import com.zhao.blog.service.IThreadPoolForArticleService;
 import com.zhao.blog.vo.ArticleOptimizeVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -17,6 +18,8 @@ import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.joda.time.DateTime;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author noblegasesgoo
@@ -139,5 +143,29 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
         ///** 开始执行更新操作 **/
         //articleMapper.update(articleForUpdate, articleLambdaQueryWrapper);
         redisTemplate.opsForHash().increment("view_count",String.valueOf(articleId),1);
+    }
+
+    /**
+     * 异步更新文章详情信息消息
+     * @param articleId
+     */
+    @Async("taskExecutorForArticle")
+    @RabbitListener(queues = "articleContentQueue")
+    public void doDeleteArticleContentCache(String articleId) throws InterruptedException {
+        log.info("=====>>>>> 删除id为{}文章缓存开始执行...  {}", articleId, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+
+        /** 当前线程延迟三秒 **/
+        TimeUnit.SECONDS.sleep(3);
+
+        /** 延迟至数据库更新完毕再更新缓存 **/
+        String params = DigestUtils.md5Hex(articleId);
+        String redisKey = "article_content::ArticleController::queryArticleById::"+params;
+
+        Boolean delete = redisTemplate.delete(redisKey);
+        if (delete) {
+            log.info("=====>>>>> id为{}文章缓存删除完毕！  {}", articleId, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        log.info("=====>>>>> id为{}文章缓存删除过程中出现问题...  {}", articleId, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
     }
 }
