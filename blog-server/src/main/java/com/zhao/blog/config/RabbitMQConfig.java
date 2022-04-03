@@ -20,21 +20,21 @@ public class RabbitMQConfig {
 
     private static final String ARTICLE_CONTENT_QUEUE = "articleContentQueue";
 
-    private static final String ARTICLE_EXCHANGE = "articleEXCHANGE";
+    private static final String ARTICLE_EXCHANGE = "articleExchange";
 
     @Bean
     public Queue articleContentQueue() {
-        return new Queue(ARTICLE_CONTENT_QUEUE, true);
+        return new Queue(ARTICLE_CONTENT_QUEUE, true, false, false, null);
     }
 
     @Bean
-    public TopicExchange articleEXCHANGE() {
-        return new TopicExchange(ARTICLE_EXCHANGE);
+    public TopicExchange articleExchange() {
+        return new TopicExchange(ARTICLE_EXCHANGE, true, false);
     }
 
     @Bean
     public Binding orderQueueBind() {
-        return BindingBuilder.bind(articleContentQueue()).to(articleEXCHANGE()).with("googookuki.blog.article");
+        return BindingBuilder.bind(articleContentQueue()).to(articleExchange()).with("googookuki.blog.article");
     }
 
 }
