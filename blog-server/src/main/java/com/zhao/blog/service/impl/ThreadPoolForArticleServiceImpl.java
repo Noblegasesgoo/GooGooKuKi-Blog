@@ -2,6 +2,7 @@ package com.zhao.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
 import com.zhao.blog.domain.entity.Article;
 import com.zhao.blog.mapper.ArticleMapper;
 import com.zhao.blog.service.IThreadPoolForArticleService;
@@ -19,6 +20,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.joda.time.DateTime;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -151,11 +153,11 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
      */
     @Async("taskExecutorForArticle")
     @RabbitListener(queues = "articleContentQueue")
-    public void doDeleteArticleContentCache(String articleId) throws InterruptedException {
+    public void doDeleteArticleContentCache(Channel channel, Message message, String articleId) throws InterruptedException {
         log.info("=====>>>>> 删除id为{}文章缓存开始执行...  {}", articleId, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
-        /** 当前线程延迟三秒 **/
-        TimeUnit.SECONDS.sleep(3);
+        /** 当前线程延迟一秒 **/
+        TimeUnit.SECONDS.sleep(1);
 
         /** 延迟至数据库更新完毕再更新缓存 **/
         String params = DigestUtils.md5Hex(articleId);
@@ -163,6 +165,13 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
 
         Boolean delete = redisTemplate.delete(redisKey);
         if (delete) {
+            /** 手动ack **/
+            try {
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             log.info("=====>>>>> id为{}文章缓存删除完毕！  {}", articleId, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
 
