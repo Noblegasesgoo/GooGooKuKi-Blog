@@ -78,7 +78,7 @@ public class ArticleController {
         return new Response(StatusCode.STATUS_CODEC200.getCode(), "查询成功！", articleVoList);
     }
 
-    @MyCache(name = "hot_article")
+    @MyCache(name = "hot_article", expire = 24 * 60 * 1000 * 60)
     @MyLogger(module = "文章管理", operation = "查询指定数量最热文章请求")
     @ApiOperation(value = "查询指定数量最热文章请求")
     @GetMapping("/public/hot/{count}")
@@ -90,18 +90,16 @@ public class ArticleController {
         }
 
         List<ArticleVo> result = articleService.listHotArticle(count);
-
         return new Response(StatusCode.STATUS_CODEC200.getCode(), "查询最热文章成功！", result);
     }
 
-    @MyCache(name = "new_article")
+    @MyCache(name = "new_article", expire = 60 * 1000 * 60)
     @MyLogger(module = "文章管理", operation = "查询首页最新文章请求")
     @ApiOperation(value = "查询首页最新文章请求")
     @GetMapping("/public/new")
     public Response queryNewArticle() {
 
         List<ArticleVo> result = articleService.listNewArticle();
-
         return new Response(StatusCode.STATUS_CODEC200.getCode(), "查询最新文章成功！", result);
     }
 
