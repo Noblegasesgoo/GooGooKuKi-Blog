@@ -92,7 +92,7 @@ public class CacheAspect {
 
             /** 尝试先从 redis 获取对应信息的缓存 **/
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(name).append("::").append(className).append("::").append(methodName).append("::").append(param);
+            stringBuilder.append(name).append(":").append(methodName).append(":").append(param);
             String redisKey = stringBuilder.toString();
 
             /** redis 对应 key 找对应 value **/
