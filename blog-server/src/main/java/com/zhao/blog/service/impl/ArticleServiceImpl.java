@@ -197,7 +197,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         log.debug("[goo-blog|ArticleServiceImpl|listHotArticle] 添加查询条件中...");
         LambdaQueryWrapper<Article> articleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        articleLambdaQueryWrapper.select(Article::getId, Article::getTitle)
+        articleLambdaQueryWrapper.select(Article::getId, Article::getTitle).eq(Article::getIsDeleted, 1)
                 .orderByDesc(Article::getViewCounts).last("limit " + count);
         log.debug("[goo-blog|ArticleServiceImpl|listHotArticle] 条件添加完成！");
 
@@ -218,7 +218,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public List<ArticleVo> listNewArticle() {
         log.debug("[goo-blog|ArticleServiceImpl|listNewArticle] 添加查询条件中...");
         LambdaQueryWrapper<Article> articleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        articleLambdaQueryWrapper.select(Article::getId, Article::getTitle, Article::getGmtCreate)
+        articleLambdaQueryWrapper.select(Article::getId, Article::getTitle, Article::getGmtCreate).eq(Article::getIsDeleted, 1)
                 .orderByDesc(Article::getGmtCreate);
         log.debug("[goo-blog|ArticleServiceImpl|listNewArticle] 条件添加完成！");
 
@@ -279,7 +279,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @return ArticleVo
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ArticleVo publishArticleByCurrentUser(ArticleParams articleParams) {
 
         /** 从登陆过后的本地线程存储空间中拿到当前创建文章的用户的信息 **/
