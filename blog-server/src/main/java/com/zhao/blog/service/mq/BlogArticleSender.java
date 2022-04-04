@@ -24,7 +24,7 @@ public class BlogArticleSender {
      * @param articleId
      */
     public void toDoDeleteArticleContentCache(Long articleId) {
-        rabbitTemplate.convertAndSend("articleEXCHANGE", "googookuki.blog.article", articleId.toString());
+        rabbitTemplate.convertAndSend("articleExchange", "googookuki.blog.article", articleId.toString());
     }
 
 }
