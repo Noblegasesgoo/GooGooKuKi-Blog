@@ -49,7 +49,7 @@ public class LoginController {
 
         String token = loginService.login(loginParams);
 
-        if (null == token && token.equals("")) {
+        if (null == token) {
             log.error("[goo-blog|LoginController|login] 登陆失败，未查找到该用户！" + token);
             return new Response(StatusCode.STATUS_CODEC10001.getCode(), "登陆失败，没有此用户，或密码错误！", token);
         }
