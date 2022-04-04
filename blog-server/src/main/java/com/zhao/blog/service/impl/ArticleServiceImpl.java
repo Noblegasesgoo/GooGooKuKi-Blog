@@ -429,15 +429,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         /** 下部就是延迟双删 **/
         /** 删除redis中关于该文章的缓存 **/
-        /** 延迟双删第一删**/
+        /** 延迟双删第一删，有没有key都删除试一试**/
 
         String params = DigestUtils.md5Hex(articleParams.getArticleId().toString());
-        String redisKey = "article_content::ArticleController::queryArticleById::"+params;
+        String redisKey = "article_content:queryArticleById:" + params;
         Boolean delete = redisTemplate.delete(redisKey);
-        if (!delete) {
-            log.error("[goo-blog|ArticleServiceImpl|updateArticleByCurrentUser] 文章编辑，缓存第一删失败...");
-            return false;
-        }
 
         /** 更新文章信息 **/
         int i = articleMapper.updateById(article);
