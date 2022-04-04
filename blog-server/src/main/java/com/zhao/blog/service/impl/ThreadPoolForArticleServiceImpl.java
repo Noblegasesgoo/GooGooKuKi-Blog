@@ -161,7 +161,7 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
 
         /** 延迟至数据库更新完毕再更新缓存 **/
         String params = DigestUtils.md5Hex(articleId);
-        String redisKey = "article_content::ArticleController::queryArticleById::"+params;
+        String redisKey = "article_content:queryArticleById:"+params;
 
         Boolean delete = redisTemplate.delete(redisKey);
         if (delete) {
