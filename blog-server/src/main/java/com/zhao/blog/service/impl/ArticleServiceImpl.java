@@ -374,6 +374,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Boolean updateArticleByCurrentUser(ArticleParams articleParams) {
 
+        /** 下部就是延迟双删 **/
+        /** 删除redis中关于该文章的缓存 **/
+        /** 延迟双删第一删，有没有key都删除试一试**/
+        String params = DigestUtils.md5Hex(articleParams.getArticleId().toString());
+        String redisKey = "article_content:queryArticleById:" + params;
+        Boolean delete = redisTemplate.delete(redisKey);
+
         /** 初始化新的文章对象 **/
         log.debug("[goo-blog|ArticleServiceImpl|updateArticleByCurrentUser] 初始化新的文章对象...");
         Article article = new Article();
@@ -426,14 +433,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleBody.setContent(articleParams.getBody().getContent());
         articleBody.setContentHtml(articleParams.getBody().getContentHtml());
         articleBodyService.updateById(articleBody);
-
-        /** 下部就是延迟双删 **/
-        /** 删除redis中关于该文章的缓存 **/
-        /** 延迟双删第一删，有没有key都删除试一试**/
-
-        String params = DigestUtils.md5Hex(articleParams.getArticleId().toString());
-        String redisKey = "article_content:queryArticleById:" + params;
-        Boolean delete = redisTemplate.delete(redisKey);
 
         /** 更新文章信息 **/
         int i = articleMapper.updateById(article);

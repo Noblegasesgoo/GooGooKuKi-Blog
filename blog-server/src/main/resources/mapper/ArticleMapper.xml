@@ -103,6 +103,8 @@
                 ga.gmt_create LIKE CONCAT(#{pageParams.date},'%') AND
             </if>
             ga.is_deleted = 0
+        ORDER BY
+            ga.gmt_create DESC
 
 
 <!--        SELECT-->

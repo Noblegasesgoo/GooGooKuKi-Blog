@@ -108,8 +108,8 @@ public class CacheAspect {
             Object proceed = proceedingJoinPoint.proceed();
 
             /** 将其存入缓存 **/
-            redisTemplate.opsForValue().set(redisKey,JSON.toJSONString(proceed), Duration.ofMillis(expire));
-            log.info("缓存中暂无，存入缓存,{},{}",className,methodName);
+            redisTemplate.opsForValue().set(redisKey, JSON.toJSONString(proceed), Duration.ofMillis(expire));
+            log.info("缓存中暂无，存入缓存,{},{}", className, methodName);
 
             return proceed;
 

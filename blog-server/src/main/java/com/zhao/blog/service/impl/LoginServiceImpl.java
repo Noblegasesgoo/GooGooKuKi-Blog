@@ -55,6 +55,7 @@ public class LoginServiceImpl implements ILoginService {
         String account = loginParams.getAccount();
         String phoneNumber = loginParams.getPhoneNumber();
         String email = loginParams.getEmail();
+
         /** 获取当前传入密码加密过后的密码 **/
         String md5Password = DigestUtils.md5Hex(loginParams.getPassword() + salt);
 
@@ -64,6 +65,9 @@ public class LoginServiceImpl implements ILoginService {
             QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<>();
             sysUserQueryWrapper.eq("phone_number", phoneNumber)
                     .last("limit 1");
+
+            // select * from user where phone_number = phone_number limit 1,1;
+
             List<SysUser> users = userService.list(sysUserQueryWrapper);
 
             if (users.size() > NUMBER_ZERO
