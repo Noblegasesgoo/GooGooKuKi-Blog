@@ -17,7 +17,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.joda.time.DateTime;
 import org.springframework.amqp.core.Message;
@@ -44,13 +43,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleService {
 
-    @Resource
+    @Autowired
     private ArticleMapper articleMapper;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Autowired
+    @Resource
     private RestHighLevelClient restHighLevelClient;
 
     @Autowired
@@ -81,30 +80,24 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
     public void initArticleDataIndexForEs() throws IOException {
 
         /** 首先查询是否存在该index **/
-        GetIndexRequest getIndexRequest = new GetIndexRequest("googookukiblogarticlesindex");
-        GetIndexResponse getIndexResponse = restHighLevelClient.indices().get(getIndexRequest, RequestOptions.DEFAULT);
+        GetIndexRequest getIndexRequest = new GetIndexRequest("googoo-kuki-blog-articles-index");
+        //GetIndexResponse getIndexResponse = restHighLevelClient.indices().get(getIndexRequest, RequestOptions.DEFAULT);
+        //GetIndexResponse getIndexResponse = restHighLevelClient.indices().get
+        Boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
 
-        if (getIndexResponse.getIndices() != null) {
+        if (exists) {
 
             log.info("[goo-blog|ThreadPoolForArticleServiceImpl|initArticleDataIndexForEs] index已经存在，结束初始化！");
             return;
         }
 
         /** 否则就在初始化时新建该index **/
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest("googookukiblogarticlesindex");
-        restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest("googoo-kuki-blog-articles-index");
+        //restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
         CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
         log.info("[goo-blog|ThreadPoolForArticleServiceImpl|initArticleDataIndexForEs] 索引是否初始化新建成功：" + createIndexResponse.isAcknowledged());
-    }
 
-    /**
-     * 更新es中的内容
-     * @throws IOException
-     */
-    @PostConstruct
-    public void syncDataToEs() throws IOException {
-
-        log.info("[goo-blog|ThreadPoolForArticleServiceImpl|syncDataToEs] 更新index所指内容...");
+        log.info("[goo-blog|ThreadPoolForArticleServiceImpl|initArticleDataIndexForEs] 更新index所指内容...");
         /** 首先从数据库查询数据 **/
         List<ArticleOptimizeVo> articleOptimizeVos = articleMapper.selectArticleForEs();
 
@@ -113,14 +106,38 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
         for (int i = 0; i < size; i++) {
 
             /** 针对 googookukiblogarticlesindex index 存入数据 **/
-            IndexRequest request = new IndexRequest("googookukiblogarticlesindex");
+            IndexRequest request = new IndexRequest("googoo-kuki-blog-articles-index");
             request.id(articleOptimizeVos.get(i).getId().toString());
             request.source(objectMapper.writeValueAsString(articleOptimizeVos.get(i)), XContentType.JSON);
             IndexResponse indexResponse = restHighLevelClient.index(request, RequestOptions.DEFAULT);
         }
-        log.info("[goo-blog|ThreadPoolForArticleServiceImpl|syncDataToEs] index所指内容更新完毕！");
-
+        log.info("[goo-blog|ThreadPoolForArticleServiceImpl|initArticleDataIndexForEs] index所指内容更新完毕！");
     }
+
+    ///**
+    // * 更新es中的内容
+    // * @throws IOException
+    // */
+    //@PostConstruct
+    //public void syncDataToEs() throws IOException {
+    //
+    //    log.info("[goo-blog|ThreadPoolForArticleServiceImpl|syncDataToEs] 更新index所指内容...");
+    //    /** 首先从数据库查询数据 **/
+    //    List<ArticleOptimizeVo> articleOptimizeVos = articleMapper.selectArticleForEs();
+    //
+    //    /** 将数据存入es中 **/
+    //    int size = articleOptimizeVos.size();
+    //    for (int i = 0; i < size; i++) {
+    //
+    //        /** 针对 googookukiblogarticlesindex index 存入数据 **/
+    //        IndexRequest request = new IndexRequest("googookukiblogarticlesindex");
+    //        request.id(articleOptimizeVos.get(i).getId().toString());
+    //        request.source(objectMapper.writeValueAsString(articleOptimizeVos.get(i)), XContentType.JSON);
+    //        IndexResponse indexResponse = restHighLevelClient.index(request, RequestOptions.DEFAULT);
+    //    }
+    //    log.info("[goo-blog|ThreadPoolForArticleServiceImpl|syncDataToEs] index所指内容更新完毕！");
+    //
+    //}
 
     /**
      * redis中原子同步更新文章浏览数量
