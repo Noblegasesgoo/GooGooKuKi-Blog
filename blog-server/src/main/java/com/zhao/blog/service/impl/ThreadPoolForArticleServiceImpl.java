@@ -80,7 +80,7 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
     public void initArticleDataIndexForEs() throws IOException {
 
         /** 首先查询是否存在该index **/
-        GetIndexRequest getIndexRequest = new GetIndexRequest("googoo-kuki-blog-articles-index");
+        GetIndexRequest getIndexRequest = new GetIndexRequest("googookukiblogarticlesindex");
         //GetIndexResponse getIndexResponse = restHighLevelClient.indices().get(getIndexRequest, RequestOptions.DEFAULT);
         //GetIndexResponse getIndexResponse = restHighLevelClient.indices().get
         Boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
@@ -92,7 +92,7 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
         }
 
         /** 否则就在初始化时新建该index **/
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest("googoo-kuki-blog-articles-index");
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest("googookukiblogarticlesindex");
         //restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
         CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
         log.info("[goo-blog|ThreadPoolForArticleServiceImpl|initArticleDataIndexForEs] 索引是否初始化新建成功：" + createIndexResponse.isAcknowledged());
@@ -106,7 +106,7 @@ public class ThreadPoolForArticleServiceImpl implements IThreadPoolForArticleSer
         for (int i = 0; i < size; i++) {
 
             /** 针对 googookukiblogarticlesindex index 存入数据 **/
-            IndexRequest request = new IndexRequest("googoo-kuki-blog-articles-index");
+            IndexRequest request = new IndexRequest("googookukiblogarticlesindex");
             request.id(articleOptimizeVos.get(i).getId().toString());
             request.source(objectMapper.writeValueAsString(articleOptimizeVos.get(i)), XContentType.JSON);
             IndexResponse indexResponse = restHighLevelClient.index(request, RequestOptions.DEFAULT);
