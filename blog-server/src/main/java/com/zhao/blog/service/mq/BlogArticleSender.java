@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
  * @author noblegasesgoo
  * @version 0.0.1
  * @date 2022/2/18 19:52
- * @description 秒杀系统消息生产者
+ * @description 博客文章消息生产者
  */
 
 @Service
