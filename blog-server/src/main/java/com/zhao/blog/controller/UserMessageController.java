@@ -38,8 +38,6 @@ public class UserMessageController {
     @Resource
     private IUserMessageService userMessageService;
 
-    //@MyCache(name = "message_all")
-    @MyLogger(module = "消息管理", operation = "查询当前用户的消息请求")
     @ApiOperation(value = "查询当前用户的消息请求")
     @PostMapping("/private/all")
     public Response queryPrivateMessage(@RequestBody MessageParams messageParams) {
