@@ -9,9 +9,10 @@ package com.zhao.blog.mail;
 public interface IThreadPoolForMailService {
 
     /**
-     * 发送文本邮件
-     * @param to 收件人
+     * 发送评论文本邮件
+     * @param to      收件人
+     * @param content 内容
      * @param subject 主题
      */
-    void sendEmailForComment(String to, String subject);
+    void sendEmailForComment(String to, String content, String subject);
 }

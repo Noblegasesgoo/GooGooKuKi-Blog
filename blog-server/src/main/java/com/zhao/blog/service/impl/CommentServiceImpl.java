@@ -111,7 +111,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             userMessage.setToUserId(authorIdByArticleId.getAuthorId());
 
             /** 发送评论邮件（异步） **/
-            threadPoolForMailService.sendEmailForComment(toUser.getEmail(), "来自伟大站长的评论邮件提醒");
+            threadPoolForMailService.sendEmailForComment(toUser.getEmail()
+                    , "有闸总锐评了君の精彩美文，他说：" + commentParams.getCommentContent()
+                            + "\n快来查看:https://www.blog.googookuki.cn/#/article/" + commentParams.getArticleId()
+                    ,"来自伟大站长的回复邮件提醒");
         } else {
             /** 设置评论等级为2，并且将评论双向绑定被回复用户 **/
             comment.setParentId(commentParams.getParentId());
@@ -123,7 +126,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             userMessage.setToUserId(commentParams.getToUserId());
 
             /** 发送评论邮件（异步） **/
-            threadPoolForMailService.sendEmailForComment(toUser.getEmail(), "来自伟大站长的回复邮件提醒");
+            threadPoolForMailService.sendEmailForComment(toUser.getEmail()
+                    , "有闸总嘴硬了君の美丽发言，他说：" + commentParams.getCommentContent()
+                            + "\n快来查看:https://www.blog.googookuki.cn/#/article/" + commentParams.getArticleId()
+                    ,"来自伟大站长的回复邮件提醒");
         }
 
         /** 将该评论插入数据库 **/

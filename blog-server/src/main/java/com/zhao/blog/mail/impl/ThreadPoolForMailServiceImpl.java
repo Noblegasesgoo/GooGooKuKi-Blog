@@ -3,7 +3,6 @@ package com.zhao.blog.mail.impl;
 import com.zhao.blog.mail.IMailService;
 import com.zhao.blog.mail.IThreadPoolForMailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,14 +18,16 @@ public class ThreadPoolForMailServiceImpl implements IThreadPoolForMailService {
     @Autowired
     private IMailService mailService;
 
+
     /**
-     * 发送文本邮件
+     * 发送评论文本邮件
+     *
      * @param to      收件人
+     * @param content 内容
      * @param subject 主题
      */
-    @Async("taskExecutorForMail")
     @Override
-    public void sendEmailForComment(String to, String subject) {
-        mailService.sendSimpleMail(to, subject);
+    public void sendEmailForComment(String to, String content, String subject) {
+        mailService.sendSimpleMail(to, content, subject);
     }
 }

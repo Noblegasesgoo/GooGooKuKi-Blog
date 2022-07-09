@@ -10,11 +10,12 @@ package com.zhao.blog.mail;
 public interface IMailService {
 
     /**
-     * 发送文本邮件
+     * 发送评论文本邮件
      * @param to 收件人
      * @param subject 主题
+     * @param content 内容
      */
-    void sendSimpleMail(String to, String subject);
+    void sendSimpleMail(String to, String content, String subject);
 
     ///**
     // * 发送HTML邮件

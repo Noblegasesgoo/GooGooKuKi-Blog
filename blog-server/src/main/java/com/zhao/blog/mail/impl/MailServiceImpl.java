@@ -33,14 +33,16 @@ public class MailServiceImpl implements IMailService {
     @Value("${spring.mail.username}")
     private String from;
 
+
     /**
-     * 简单文本邮件
-     * @param to 收件人
-     * @param subject 主题
+     * 发送评论文本邮件
+     *
+     * @param to      收件人
      * @param content 内容
+     * @param subject 主题
      */
     @Override
-    public void sendSimpleMail(String to, String subject) {
+    public void sendSimpleMail(String to, String content, String subject) {
         // 创建SimpleMailMessage对象
         SimpleMailMessage message = new SimpleMailMessage();
         // 邮件发送人
@@ -50,7 +52,7 @@ public class MailServiceImpl implements IMailService {
         // 邮件主题
         message.setSubject(subject);
         // 邮件内容
-        message.setText("有闸总锐评了君の精品美文，快来查看！https://www.blog.googookuki.cn/");
+        message.setText(content);
         // 发送邮件
         mailSender.send(message);
     }
