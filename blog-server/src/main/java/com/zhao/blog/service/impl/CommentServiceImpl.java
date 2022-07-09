@@ -5,9 +5,11 @@ import com.zhao.blog.domain.entity.Article;
 import com.zhao.blog.domain.entity.Comment;
 import com.zhao.blog.domain.entity.SysUser;
 import com.zhao.blog.domain.entity.UserMessage;
+import com.zhao.blog.mail.IThreadPoolForMailService;
 import com.zhao.blog.mapper.CommentMapper;
 import com.zhao.blog.service.IArticleService;
 import com.zhao.blog.service.ICommentService;
+import com.zhao.blog.service.ISysUserService;
 import com.zhao.blog.service.IUserMessageService;
 import com.zhao.blog.vo.CommentVo;
 import com.zhao.blog.vo.params.CommentParams;
@@ -44,6 +46,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Autowired
     private IArticleService articleService;
 
+    /** 发送邮件使用 **/
+    @Autowired
+    private IThreadPoolForMailService threadPoolForMailService;
+
+    /** 获取用户信息使用 **/
+    @Autowired
+    private ISysUserService userService;
+
     /**
      * 查询对应文章的所有一级评论
      * @param id
@@ -68,6 +78,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Boolean createComment(CommentParams commentParams, SysUser user) {
 
+        /** 获得被评论人的所有信息（主要使用邮箱）**/
+        SysUser toUser = userService.getById(commentParams.getToUserId());
 
         Comment comment = new Comment();
         UserMessage userMessage = new UserMessage();
@@ -98,6 +110,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             userMessage.setType(1);
             userMessage.setToUserId(authorIdByArticleId.getAuthorId());
 
+            /** 发送评论邮件（异步） **/
+            threadPoolForMailService.sendEmailForComment(toUser.getEmail(), "来自伟大站长的评论邮件提醒");
         } else {
             /** 设置评论等级为2，并且将评论双向绑定被回复用户 **/
             comment.setParentId(commentParams.getParentId());
@@ -107,13 +121,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             /** 由于是新的回复，设置消息类型为2 **/
             userMessage.setType(2);
             userMessage.setToUserId(commentParams.getToUserId());
+
+            /** 发送评论邮件（异步） **/
+            threadPoolForMailService.sendEmailForComment(toUser.getEmail(), "来自伟大站长的回复邮件提醒");
         }
 
         /** 将该评论插入数据库 **/
         int result = commentMapper.insert(comment);
 
         /** 同时向消息表中加入新的评论通知 **/
-
         /** 如果不是自己评论自己文章，就提示消息 **/
         if (!(commentParams.getToUserId() == user.getId() && authorIdByArticleId.getAuthorId() == user.getId())) {
 
