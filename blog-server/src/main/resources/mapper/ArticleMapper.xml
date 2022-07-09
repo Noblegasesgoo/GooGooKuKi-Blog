@@ -69,6 +69,8 @@
             COUNT(*) AS `count`
         FROM
             goo_article ga
+        WHERE
+            ga.is_deleted = 0
         GROUP BY
             `year`,
             `month`
