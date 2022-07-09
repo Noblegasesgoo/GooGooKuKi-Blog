@@ -24,15 +24,15 @@ public class ThreadPoolConfig {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
         /** 设置核心线程数 **/
-        threadPoolTaskExecutor.setCorePoolSize(3);
+        threadPoolTaskExecutor.setCorePoolSize(1);
         /** 设置线程池最大线程容纳数量 **/
-        threadPoolTaskExecutor.setMaxPoolSize(10);
+        threadPoolTaskExecutor.setMaxPoolSize(2);
         /** 设置阻塞队列最大容纳任务数量 **/
         threadPoolTaskExecutor.setQueueCapacity(100);
         /** 设置临时核心线程无任务后存活时间 **/
         threadPoolTaskExecutor.setKeepAliveSeconds(120);
         /** 设置线程池线程昵称前缀 **/
-        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog");
+        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog-article");
         /** 设置关闭线程池是在所有任务完成之后 **/
         threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
 
@@ -49,15 +49,15 @@ public class ThreadPoolConfig {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
         /** 设置核心线程数 **/
-        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setCorePoolSize(1);
         /** 设置线程池最大线程容纳数量 **/
-        threadPoolTaskExecutor.setMaxPoolSize(10);
+        threadPoolTaskExecutor.setMaxPoolSize(2);
         /** 设置阻塞队列最大容纳任务数量 **/
         threadPoolTaskExecutor.setQueueCapacity(100);
         /** 设置临时核心线程无任务后存活时间 **/
         threadPoolTaskExecutor.setKeepAliveSeconds(120);
         /** 设置线程池线程昵称前缀 **/
-        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog");
+        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog-log");
         /** 设置关闭线程池是在所有任务完成之后 **/
         threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
 
@@ -67,7 +67,7 @@ public class ThreadPoolConfig {
         return threadPoolTaskExecutor;
     }
 
-    @Bean("taskExecutorForMessage")
+    @Bean("taskExecutorForMail")
     public Executor asyncMessageServiceExecutor() {
 
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
@@ -75,13 +75,13 @@ public class ThreadPoolConfig {
         /** 设置核心线程数 **/
         threadPoolTaskExecutor.setCorePoolSize(2);
         /** 设置线程池最大线程容纳数量 **/
-        threadPoolTaskExecutor.setMaxPoolSize(10);
+        threadPoolTaskExecutor.setMaxPoolSize(4);
         /** 设置阻塞队列最大容纳任务数量 **/
         threadPoolTaskExecutor.setQueueCapacity(100);
         /** 设置临时核心线程无任务后存活时间 **/
         threadPoolTaskExecutor.setKeepAliveSeconds(120);
         /** 设置线程池线程昵称前缀 **/
-        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog");
+        threadPoolTaskExecutor.setThreadNamePrefix("noblegasesgoo-goo-blog-message");
         /** 设置关闭线程池是在所有任务完成之后 **/
         threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
 
